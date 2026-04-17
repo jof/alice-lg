@@ -236,19 +236,20 @@ func decodeCommunities(c interface{}) api.Communities {
 
 // decodeExtendedCommunities decodes extended communities
 // into a list of (str, int, int).
+// Expected format: "TYPE VALUE:VALUE" (e.g., "rt 63055:1000")
 func decodeExtendedCommunities(c interface{}) api.ExtCommunities {
 	details := decoders.StringList(c)
 	comms := make(api.ExtCommunities, 0, len(details))
 	for _, com := range details {
 		tokens := strings.SplitN(com, " ", 2)
 		if len(tokens) != 2 {
-			log.Println("can not decode ext. community:", com)
+			log.Printf("can not decode ext. community: %q (expected format: TYPE VALUE:VALUE)", com)
 			continue
 		}
 		nums := decoders.IntListFromStrings(
 			strings.SplitN(tokens[1], ":", 2))
 		if len(nums) != 2 {
-			log.Println("can not decode ext. community:", com)
+			log.Printf("can not decode ext. community: %q (value %q is not in format VALUE:VALUE)", com, tokens[1])
 			continue
 		}
 		comms = append(comms, []interface{}{tokens[0], nums[0], nums[1]})
